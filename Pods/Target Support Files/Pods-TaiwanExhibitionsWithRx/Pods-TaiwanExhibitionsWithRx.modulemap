@@ -1,0 +1,6 @@
+framework module Pods_TaiwanExhibitionsWithRx {
+  umbrella header "Pods-TaiwanExhibitionsWithRx-umbrella.h"
+
+  export *
+  module * { export * }
+}
