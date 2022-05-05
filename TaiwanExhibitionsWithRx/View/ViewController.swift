@@ -40,7 +40,7 @@ class ViewController: UIViewController, UITableViewDelegate {
     
     private func setupTableView() {
         tableView.register(UINib(nibName:String(describing: ExhibitionTableViewCell.self), bundle:nil), forCellReuseIdentifier:String(describing: ExhibitionTableViewCell.self))
-        tableView.addSubview(refreshControl)
+        tableView.refreshControl = refreshControl
         tableView.rx.itemSelected.subscribe { [weak self] indexPath in
             self?.tableView.deselectRow(at: indexPath, animated: true)
         }.disposed(by: disposeBag)
@@ -60,8 +60,8 @@ class ViewController: UIViewController, UITableViewDelegate {
                 cell.config(item: element)
                 
                 return cell
-            }
-            .disposed(by: disposeBag)
+            }.disposed(by: disposeBag)
+        
         refreshControl.rx.controlEvent(.valueChanged).bind(to: viewModel.triggerAPI).disposed(by: disposeBag)
         viewModel.isLoading.bind(to: refreshControl.rx.isRefreshing).disposed(by: disposeBag)
     }

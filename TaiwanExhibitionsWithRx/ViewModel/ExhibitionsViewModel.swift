@@ -34,11 +34,20 @@ class ExhibitionsViewModel {
         let triggerAPISubject = PublishSubject<Void>()
         triggerAPI = triggerAPISubject.asObserver()
         
-        let fetchExhibitionsListResult = triggerAPISubject.asObservable().flatMapLatest { _ in
-            apiService.requestAllExhibitions().trackActivity(indicator)
-        }.share()
-        fetchExhibitionsListResult.bind { exhibitions -> Void in
-            exhibitionsListRelay.accept(exhibitions)
+        triggerAPISubject.subscribe { _ in
+            exhibitionsListRelay.accept([])
         }.disposed(by: disposeBag)
+        
+        let fetchExhibitionsListResult = triggerAPISubject
+            .asObservable()
+            .flatMapLatest { _ in
+                apiService.requestAllExhibitions().trackActivity(indicator)
+            }.share()
+        
+        fetchExhibitionsListResult
+            .observe(on: MainScheduler.instance)
+            .bind { exhibitions -> Void in
+                exhibitionsListRelay.accept(exhibitions)
+            }.disposed(by: disposeBag)
     }
 }

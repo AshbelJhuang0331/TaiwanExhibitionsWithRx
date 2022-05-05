@@ -42,18 +42,19 @@ class API: APIProtocol {
             let url = self?.urlComponents.url
             let request = URLRequest(url: url!)
             
-            self?.session.rx.response(request: request).subscribe(onNext: { (response) in
-                var allExhibitions: [ExhibitionModel] = []
-                do {
-                    allExhibitions = try JSONDecoder().decode([ExhibitionModel].self, from: response.data)
-    //                print("self.allExhibitions: \(String(describing: self?.allExhibitions))")
-                    single(.success(allExhibitions))
-                } catch {
+            self?.session.rx.response(request: request)
+                .subscribe(onNext: { (response) in
+                    var allExhibitions: [ExhibitionModel] = []
+                    do {
+                        allExhibitions = try JSONDecoder().decode([ExhibitionModel].self, from: response.data)
+                        single(.success(allExhibitions))
+                    } catch {
+                        single(.failure(error))
+                    }
+                }, onError: { (error) in
                     single(.failure(error))
-                }
-            }, onError: { (error) in
-                single(.failure(error))
-            }).disposed(by: self!.disposeBag)
+                })
+                .disposed(by: self!.disposeBag)
             return Disposables.create()
         }
     }
